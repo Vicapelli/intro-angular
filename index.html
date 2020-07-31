@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html ng-App="meuModulo">
+<head>
+
+    <title>Angular JS</title>
+    <script scr="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+</head>
+<body ng-controller="indexController" class="container">
+    <header>
+        <h1 ng-bind="title"></h1>
+    </header>
+    <main>
+        <div>
+            <div class="input-group mb-5 mt-5" >
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Busca</span>
+                </div>
+                <input type="text" ng-model="busca" aria-label="Busca" class="form-control">
+              </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Nota 1</th>
+                    <th>Nota 2</th>
+                    <th>Media</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="aluno in alunos | filter:busca">
+                    <td>{{aluno.nome}}</td>
+                    <td>{{aluno.email}}</td>
+                    <td>{{aluno.nota1}}</td>
+                    <td>{{aluno.nota2}}</td>
+                    <td>{{aluno.media}}</td>
+                    <td><button ng-click="editarAluno(aluno)" class="btn btn-warning">Editar</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
+
+     
+    <button ng-click="editando = false" class="btn btn-primary mt-3" id="btn-mensagem">Adicionar</button>
+  
+  <!-- Modal -->
+
+  <div class="modal fade" id="modalExemplo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 ng-if="!editando" class="modal-title" id="exampleModalLabel">Adicionar Aluno</h5>
+          <h5 ng-if="editando" class="modal-title" id="exampleModalLabel">Editar Aluno</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <input type="text" ng-model="Aluno.nome" placeholder="Nome">
+            <input type="text" ng-model="Aluno.email" placeholder="Email">
+            <input type="text" ng-model="Aluno.nota1" placeholder="Nota 1">
+            <input type="text" ng-model="Aluno.nota2" placeholder="Nota 2">
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          <button ng-if="!editando" ng-click="add(Aluno)" type="button" class="btn btn-primary">Adicionar</button>
+          <button ng-if="editando" ng-click="salvar(Aluno)" type="button" class="btn btn-primary">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="lib/angular/angular.min.js"></script>
+
+    <!--chamando o modal com JS-->
+
+    <script>
+        $(function(){
+            $("#btn-mensagem").click(function(){
+                $("#modalExemplo").modal();
+            });
+        });
+    </script>
+    
+
+
+    <script type="text/javascript">
+        angular.module("meuModulo",[])
+        .controller("indexController",function($scope){
+            $scope.title = "Sistema com Angular JS";
+
+            $scope.alunos = [
+                {nome: "ana", email: "camila@cam.com", nota1: 65, nota2: 80},
+                {nome: "victor", email: "victor@test.com", nota1: 50, nota2: 60},
+                {nome: "murilo", email: "murilo@test.com", nota1: 40, nota2: 45}
+            ];
+
+
+            let init = function(){
+                $scope.alunos.forEach(function(aluno){
+                    aluno.media = media(aluno);
+                });
+            };
+
+            let media = function(aluno){
+                result = (parseFloat(aluno.nota1) + parseFloat(aluno.nota2)) / 2;
+                return result.toFixed(2);
+            };
+
+            $scope.add = function(Aluno){
+                Aluno.media = media(Aluno);
+                $scope.alunos.push(Aluno);
+                $('#modalExemplo').modal('hide');
+                $scope.Aluno = {nome: "", email: "", nota1: '', nota2: ''};
+            };
+
+
+            $scope.editando = false;
+            let alunoEditar;
+
+            $scope.editarAluno = function(Aluno){
+                $scope.editando = true;
+                angular.copy(Aluno,$scope.Aluno);
+                $('#modalExemplo').modal('show');
+                alunoEditar = Aluno;
+            };
+
+            $scope.salvar = function(Aluno){
+                alunoEditar.nome = Aluno.nome;
+                alunoEditar.email = Aluno.email;
+                alunoEditar.nota1 = Aluno.nota1;
+                alunoEditar.nota2 = Aluno.nota2;
+                alunoEditar.media = media(Aluno);
+                $('#modalExemplo').modal('hide');
+            };
+
+            init();
+        })
+
+        
+
+    </script>
+</body>
+</html>
